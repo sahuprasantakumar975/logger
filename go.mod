@@ -1,6 +1,5 @@
 module github.com/sahuprasantakumar975/logger
 
-
 go 1.23.4
 
 require github.com/sirupsen/logrus v1.9.3
