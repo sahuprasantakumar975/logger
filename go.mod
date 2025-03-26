@@ -1,4 +1,5 @@
-module logger
+module github.com/sahuprasantakumar975/logger
+
 
 go 1.23.4
 
