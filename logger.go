@@ -66,17 +66,15 @@ func (l *Logger) Log(level, message string, data LogData) {
 	data.Message = message
 
 	// Set dynamic hostname and IP if not already provided
-	if data.Hostname == "" {
-		hostname, err := os.Hostname()
-		if err == nil {
-			data.Hostname = hostname
-		} else {
-			data.Hostname = "Unknown"
-		}
+
+	hostname, err := os.Hostname()
+	if err == nil {
+		data.Hostname = hostname
+	} else {
+		data.Hostname = "Unknown"
 	}
-	if data.IPAddress == "" {
-		data.IPAddress = GetLocalIP()
-	}
+
+	data.IPAddress = GetLocalIP()
 
 	jsonData, _ := json.Marshal(data)
 
