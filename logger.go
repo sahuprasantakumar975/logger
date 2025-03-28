@@ -61,8 +61,22 @@ func NewLogger(graylogHost, graylogPort, protocol string) *Logger {
 
 // Log logs a message and sends it to Graylog
 func (l *Logger) Log(level, message string, data LogData) {
+	// Automatically set timestamp, hostname, and IP dynamically
 	data.Timestamp = time.Now().UTC().Format(time.RFC3339)
 	data.Message = message
+
+	// Set dynamic hostname and IP if not already provided
+	if data.Hostname == "" {
+		hostname, err := os.Hostname()
+		if err == nil {
+			data.Hostname = hostname
+		} else {
+			data.Hostname = "Unknown"
+		}
+	}
+	if data.IPAddress == "" {
+		data.IPAddress = GetLocalIP()
+	}
 
 	jsonData, _ := json.Marshal(data)
 
@@ -125,4 +139,20 @@ func sendTCP(address string, data []byte) error {
 
 	_, err = conn.Write(append(data, '\n')) // GELF messages should end with a newline
 	return err
+}
+
+// GetLocalIP retrieves the local machine's IP address.
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "Unknown"
+	}
+	for _, addr := range addrs {
+		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				return ipNet.IP.String()
+			}
+		}
+	}
+	return "Unknown"
 }
